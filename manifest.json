@@ -1,0 +1,20 @@
+{
+  "name": "FitCoach AI — Lean Bulk Tracker",
+  "short_name": "FitCoach AI",
+  "description": "Workout plans + diet tracker for lean bulk journey",
+  "start_url": "./FitCoach_AI.html",
+  "display": "standalone",
+  "background_color": "#080810",
+  "theme_color": "#ff6b35",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["health", "fitness"],
+  "lang": "en"
+}
