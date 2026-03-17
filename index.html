@@ -335,6 +335,81 @@ option{background:var(--bg3);color:var(--text);}
 .toast.info{border-left:3px solid var(--blue);}
 @keyframes toastIn{from{opacity:0;transform:translateX(20px);}to{opacity:1;transform:translateX(0);}}
 @keyframes toastOut{from{opacity:1;}to{opacity:0;transform:translateX(20px);}}
+
+/* BOTTOM NAV (mobile) */
+#bottom-nav{
+  display:none;position:fixed;bottom:0;left:0;right:0;
+  background:var(--bg2);border-top:1px solid var(--border);
+  z-index:200;padding-bottom:env(safe-area-inset-bottom);
+}
+.bnav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:8px 4px;background:none;border:none;color:var(--text3);
+  cursor:pointer;transition:color 0.2s;font-family:'Barlow',sans-serif;gap:2px;
+}
+.bnav-btn.active{color:var(--orange);}
+.bnav-icon{font-size:20px;line-height:1;}
+.bnav-label{font-size:10px;font-weight:600;letter-spacing:0.2px;}
+
+/* MOBILE RESPONSIVE */
+@media(max-width:768px){
+  :root{--sidebar:0px;}
+  #sidebar{display:none;}
+  #main{margin-left:0;padding:12px 12px calc(70px + env(safe-area-inset-bottom));}
+  #bottom-nav{display:flex;}
+  #toast-container{left:12px;right:12px;bottom:calc(70px + env(safe-area-inset-bottom) + 8px);}
+
+  /* Dashboard */
+  .macro-rings-row{grid-template-columns:repeat(2,1fr);}
+  .dash-grid{grid-template-columns:1fr;}
+  .twin-bars{grid-template-columns:1fr;gap:12px;}
+  .greeting-bar{flex-direction:row;align-items:center;}
+  .greeting-text .g-hello{font-size:18px;}
+
+  /* Diet / Nutrition / Recipes */
+  .veg-grid{grid-template-columns:1fr 1fr;}
+  .recipes-grid{grid-template-columns:1fr;}
+  .tab-bar{width:100%;}
+  .tab-btn{flex:1;padding:8px 6px;font-size:12px;}
+  .day-toggle{width:100%;}
+  .day-toggle-btn{flex:1;padding:7px 8px;font-size:13px;}
+  .meal-row{flex-wrap:wrap;gap:8px;}
+  .meal-add-btn{width:100%;margin-top:0;}
+  .meal-time-badge{min-width:60px;font-size:11px;}
+
+  /* Food Log */
+  .log-summary{grid-template-columns:repeat(2,1fr);}
+  .food-add-row{flex-direction:column;}
+  .food-select-wrap{min-width:unset;}
+  .filter-chips{gap:6px;}
+
+  /* Workout */
+  .day-pills{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch;}
+  .day-pill{flex-shrink:0;padding:8px 14px;font-size:12px;}
+
+  /* Progress */
+  .stats-grid{grid-template-columns:repeat(3,1fr);gap:8px;}
+  .stat-box-val{font-size:20px;}
+  .stat-box{padding:12px 8px;}
+  .weight-log-row{flex-direction:column;}
+  .weight-log-row .btn{width:100%;}
+
+  /* AI Coach */
+  .api-key-row{flex-direction:column;}
+  .chat-window{height:calc(100vh - 420px);min-height:200px;}
+  .quick-prompts{gap:6px;}
+  .qp-btn{padding:7px 10px;font-size:11px;}
+
+  /* General */
+  .page-title{font-size:22px;}
+  .page-header{margin-bottom:16px;}
+  .card{padding:14px;}
+  .btn{min-height:44px;}
+  .btn-sm{min-height:36px;padding:8px 12px;}
+  .btn-xs{min-height:30px;}
+  select,input[type=text],input[type=number],input[type=password],textarea{font-size:16px;} /* prevents zoom on iOS */
+  .chat-input-row textarea{font-size:16px;height:44px;}
+}
 </style>
 </head>
 <body>
@@ -354,6 +429,16 @@ option{background:var(--bg3);color:var(--text);}
   <div class="sidebar-bottom">
     <div class="sidebar-date" id="sidebarDate"></div>
   </div>
+</nav>
+
+<!-- BOTTOM NAV (mobile only) -->
+<nav id="bottom-nav">
+  <button class="bnav-btn active" onclick="navTo('dashboard')"><span class="bnav-icon">⚡</span><span class="bnav-label">Home</span></button>
+  <button class="bnav-btn" onclick="navTo('diet')"><span class="bnav-icon">🥗</span><span class="bnav-label">Diet</span></button>
+  <button class="bnav-btn" onclick="navTo('foodlog')"><span class="bnav-icon">🍽️</span><span class="bnav-label">Log</span></button>
+  <button class="bnav-btn" onclick="navTo('workout')"><span class="bnav-icon">💪</span><span class="bnav-label">Workout</span></button>
+  <button class="bnav-btn" onclick="navTo('progress')"><span class="bnav-icon">📈</span><span class="bnav-label">Progress</span></button>
+  <button class="bnav-btn" onclick="navTo('aicoach')"><span class="bnav-icon">🤖</span><span class="bnav-label">AI</span></button>
 </nav>
 
 <!-- MAIN -->
@@ -827,9 +912,13 @@ let currentPage='dashboard';
 function navTo(page){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+page).classList.add('active');
   const btn=document.querySelector(`.nav-btn[onclick="navTo('${page}')"]`);
   if(btn)btn.classList.add('active');
+  const bnavBtn=document.querySelector(`#bottom-nav .bnav-btn[onclick="navTo('${page}')"]`);
+  if(bnavBtn)bnavBtn.classList.add('active');
+  document.getElementById('main').scrollTop=0;
   currentPage=page;
   if(page==='dashboard')renderDashboard();
   else if(page==='foodlog')renderFoodLog();
