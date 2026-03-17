@@ -547,6 +547,14 @@ option{background:var(--bg3);color:var(--text);}
   </div>
 
   <div class="tab-panel active" id="dt-mealplan">
+    <div class="day-toggle" style="margin-bottom:10px">
+      <button class="day-toggle-btn active" id="dmb-original" onclick="setDietMode('original')">🌍 Original</button>
+      <button class="day-toggle-btn" id="dmb-indian" onclick="setDietMode('indian')">🇮🇳 Indian</button>
+    </div>
+    <div class="day-toggle" id="indianDietToggle" style="display:none;margin-bottom:10px">
+      <button class="day-toggle-btn active" id="dtb-nonveg" onclick="setIndianDiet('nonveg')">🍗 Non-Veg</button>
+      <button class="day-toggle-btn" id="dtb-iveg" onclick="setIndianDiet('veg')">🥦 Pure Veg</button>
+    </div>
     <div class="day-toggle">
       <button class="day-toggle-btn active" id="dtb-gym" onclick="setDayType('gym')">🏋️ Gym Day</button>
       <button class="day-toggle-btn" id="dtb-work" onclick="setDayType('work')">💼 Work Day</button>
@@ -582,6 +590,7 @@ option{background:var(--bg3);color:var(--text);}
     <div class="filter-chips" id="foodFilterChips">
       <div class="filter-chip active" onclick="setFoodFilter('all',this)">All</div>
       <div class="filter-chip" onclick="setFoodFilter('chicken',this)">🍗 Chicken</div>
+      <div class="filter-chip" onclick="setFoodFilter('mutton',this)">🐑 Mutton</div>
       <div class="filter-chip" onclick="setFoodFilter('eggs',this)">🥚 Eggs</div>
       <div class="filter-chip" onclick="setFoodFilter('veg',this)">🥦 Veggies</div>
       <div class="filter-chip" onclick="setFoodFilter('carbs',this)">🍚 Carbs</div>
@@ -727,6 +736,19 @@ const FOODS = [
   {id:'coat',name:'Oats dry (100g)',cal:389,protein:17,carbs:66,fats:7,cat:'carbs'},
   {id:'cspo',name:'Sweet potato (100g)',cal:86,protein:1.6,carbs:20,fats:0.1,cat:'carbs'},
   {id:'cban',name:'Banana (1 medium)',cal:105,protein:1.3,carbs:27,fats:0.4,cat:'carbs'},
+  // Indian Non-Veg
+  {id:'iebhurji3',name:'Egg bhurji - 3 eggs (spiced)',cal:240,protein:18,carbs:3,fats:18,cat:'eggs'},
+  {id:'iroti1',name:'Roti/Chapati (1 piece)',cal:120,protein:3,carbs:18,fats:3,cat:'carbs'},
+  {id:'ichkcurry200',name:'Chicken curry (200g)',cal:330,protein:50,carbs:6,fats:14,cat:'chicken'},
+  {id:'ichkcurry150',name:'Chicken curry (150g)',cal:248,protein:37,carbs:4,fats:10,cat:'chicken'},
+  {id:'imutton150',name:'Mutton curry (150g)',cal:330,protein:33,carbs:6,fats:19,cat:'mutton'},
+  {id:'imutton100',name:'Mutton curry (100g)',cal:220,protein:22,carbs:4,fats:13,cat:'mutton'},
+  // Indian Veg
+  {id:'idalchilla3',name:'Moong dal chilla (3 pieces)',cal:300,protein:18,carbs:48,fats:4,cat:'veg'},
+  {id:'idal300',name:'Dal tadka (300g cooked)',cal:348,protein:27,carbs:60,fats:1,cat:'veg'},
+  {id:'irajma200',name:'Rajma curry (200g cooked)',cal:254,protein:17,carbs:44,fats:1,cat:'veg'},
+  {id:'ichana100',name:'Chana boiled (100g)',cal:164,protein:9,carbs:27,fats:3,cat:'veg'},
+  {id:'isprout100',name:'Moong sprouts (100g)',cal:105,protein:7,carbs:19,fats:0,cat:'veg'},
 ];
 
 const MEAL_PLANS = {
@@ -829,6 +851,120 @@ const RECIPES = [
    foods:[{id:'cb200',qty:1},{id:'vbro',qty:1},{id:'vgb',qty:1},{id:'cspo',qty:1.5}]},
 ];
 
+const INDIAN_MEAL_PLANS = {
+  nonveg:{
+    gym:{
+      total:2340,
+      meals:[
+        {time:'7:00 AM',name:'Egg Bhurji + Roti',desc:'3-egg bhurji with onion, green chilli & spices + 2 whole wheat rotis',
+         cal:480,protein:24,carbs:39,fats:24,
+         foods:[{id:'iebhurji3',qty:1},{id:'iroti1',qty:2}]},
+        {time:'10:00 AM',name:'Boiled Eggs + Banana',desc:'2 boiled eggs + 1 banana — mid-morning protein hit',
+         cal:261,protein:13,carbs:28,fats:10,
+         foods:[{id:'eb2',qty:1},{id:'cban',qty:1}]},
+        {time:'1:00 PM',name:'Chicken Curry Rice',desc:'200g chicken curry + 200g rice + mixed sabzi — budget bulk meal',
+         cal:626,protein:57,carbs:69,fats:15,
+         foods:[{id:'ichkcurry200',qty:1},{id:'cric',qty:2},{id:'vmix',qty:0.67}]},
+        {time:'4:30 PM',name:'Pre-Workout Snack',desc:'2 boiled eggs + 1 banana — quick energy before gym',
+         cal:261,protein:13,carbs:28,fats:10,
+         foods:[{id:'eb2',qty:1},{id:'cban',qty:1}]},
+        {time:'8:00 PM',name:'Post-Workout Mutton Rice',desc:'150g mutton curry + 150g rice + cucumber salad',
+         cal:541,protein:38,carbs:52,fats:20,
+         foods:[{id:'imutton150',qty:1},{id:'cric',qty:1.5},{id:'vcuc',qty:1}]},
+        {time:'10:30 PM',name:'Pre-Bed Protein',desc:'3 egg whites + 1 roti — slow overnight protein',
+         cal:171,protein:14,carbs:19,fats:3,
+         foods:[{id:'ewhites3',qty:1},{id:'iroti1',qty:1}]},
+      ]
+    },
+    work:{
+      total:2321,
+      meals:[
+        {time:'6:00 AM',name:'Egg Bhurji + Roti',desc:'3-egg bhurji + 2 rotis — quick before 13-hr shift',
+         cal:480,protein:24,carbs:39,fats:24,
+         foods:[{id:'iebhurji3',qty:1},{id:'iroti1',qty:2}]},
+        {time:'9:00 AM',name:'Shift Snack 1',desc:'2 boiled eggs + 1 banana — easy to carry to work',
+         cal:261,protein:13,carbs:28,fats:10,
+         foods:[{id:'eb2',qty:1},{id:'cban',qty:1}]},
+        {time:'12:00 PM',name:'Packed Chicken Lunch',desc:'200g chicken curry + 200g rice — meal prepped the night before',
+         cal:590,protein:55,carbs:62,fats:15,
+         foods:[{id:'ichkcurry200',qty:1},{id:'cric',qty:2}]},
+        {time:'3:00 PM',name:'Shift Snack 2',desc:'2 boiled eggs — protein top-up mid shift',
+         cal:156,protein:12,carbs:1,fats:10,
+         foods:[{id:'eb2',qty:1}]},
+        {time:'After Shift',name:'Post-Shift Dinner',desc:'150g mutton curry + 150g rice + 1 roti + tomato salad',
+         cal:663,protein:41,carbs:70,fats:23,
+         foods:[{id:'imutton150',qty:1},{id:'cric',qty:1.5},{id:'iroti1',qty:1},{id:'vtom',qty:1}]},
+        {time:'Pre-Bed',name:'Night Protein',desc:'3 egg whites + 1 roti — overnight muscle repair',
+         cal:171,protein:14,carbs:19,fats:3,
+         foods:[{id:'ewhites3',qty:1},{id:'iroti1',qty:1}]},
+      ]
+    }
+  },
+  veg:{
+    gym:{
+      total:2178,
+      meals:[
+        {time:'7:00 AM',name:'Moong Dal Chilla + Oats',desc:'3 moong dal chillas with green chutney + 50g oats — high protein veg breakfast',
+         cal:495,protein:27,carbs:81,fats:8,
+         foods:[{id:'idalchilla3',qty:1},{id:'coat',qty:0.5}]},
+        {time:'10:00 AM',name:'Chana Chaat',desc:'100g boiled chana + cucumber + tomato + lemon + chaat masala',
+         cal:198,protein:11,carbs:35,fats:3,
+         foods:[{id:'ichana100',qty:1},{id:'vcuc',qty:1},{id:'vtom',qty:1}]},
+        {time:'1:00 PM',name:'Rajma Chawal',desc:'200g rajma curry + 200g rice + 100g mixed sabzi — budget power lunch',
+         cal:550,protein:24,carbs:107,fats:2,
+         foods:[{id:'irajma200',qty:1},{id:'cric',qty:2},{id:'vmix',qty:0.67}]},
+        {time:'4:00 PM',name:'Pre-Workout Snack',desc:'1 banana + 100g moong sprouts — natural clean energy before gym',
+         cal:210,protein:8,carbs:46,fats:0,
+         foods:[{id:'cban',qty:1},{id:'isprout100',qty:1}]},
+        {time:'8:00 PM',name:'Dal Tadka + Roti',desc:'300g dal tadka + 3 rotis + salad — post-workout protein & carbs',
+         cal:725,protein:36,carbs:114,fats:10,
+         foods:[{id:'idal300',qty:1},{id:'iroti1',qty:3},{id:'vcuc',qty:0.5},{id:'vtom',qty:0.5}]},
+      ]
+    },
+    work:{
+      total:2198,
+      meals:[
+        {time:'6:00 AM',name:'Dal Chilla + Roti',desc:'3 moong dal chillas + 2 rotis — filling start before long shift',
+         cal:540,protein:24,carbs:84,fats:10,
+         foods:[{id:'idalchilla3',qty:1},{id:'iroti1',qty:2}]},
+        {time:'9:00 AM',name:'Chana + Banana',desc:'100g boiled chana + 1 banana — portable shift snack',
+         cal:269,protein:10,carbs:54,fats:3,
+         foods:[{id:'ichana100',qty:1},{id:'cban',qty:1}]},
+        {time:'12:00 PM',name:'Packed Rajma Rice',desc:'200g rajma + 200g rice — meal prepped, easy to carry',
+         cal:514,protein:22,carbs:100,fats:2,
+         foods:[{id:'irajma200',qty:1},{id:'cric',qty:2}]},
+        {time:'3:00 PM',name:'Sprouts Snack',desc:'100g moong sprouts + tomato — zero cooking needed',
+         cal:123,protein:8,carbs:23,fats:0,
+         foods:[{id:'isprout100',qty:1},{id:'vtom',qty:1}]},
+        {time:'After Shift',name:'Post-Shift Dal Rice',desc:'300g dal + 2 rotis + 100g rice + salad — recovery after 13hr shift',
+         cal:752,protein:39,carbs:131,fats:8,
+         foods:[{id:'idal300',qty:1},{id:'iroti1',qty:2},{id:'cric',qty:1},{id:'vbro',qty:1}]},
+      ]
+    }
+  }
+};
+
+const INDIAN_RECIPES = [
+  {name:'Egg Bhurji Bowl',emoji:'🍳',cal:480,protein:24,carbs:39,fats:24,
+   ingredients:['3 eggs bhurji with onion & green chilli','2 whole wheat rotis','Spices: cumin, turmeric, chilli'],
+   foods:[{id:'iebhurji3',qty:1},{id:'iroti1',qty:2}]},
+  {name:'Chicken Curry Rice',emoji:'🍗',cal:590,protein:55,carbs:62,fats:15,
+   ingredients:['200g chicken curry (budget cut)','200g steamed rice','Spices: garam masala, coriander'],
+   foods:[{id:'ichkcurry200',qty:1},{id:'cric',qty:2}]},
+  {name:'Mutton Masala Bowl',emoji:'🐑',cal:541,protein:38,carbs:52,fats:20,
+   ingredients:['150g mutton curry','150g steamed rice','Cucumber raita (no curd version: cucumbers)'],
+   foods:[{id:'imutton150',qty:1},{id:'cric',qty:1.5},{id:'vcuc',qty:1}]},
+  {name:'Dal Tadka + Roti',emoji:'🫘',cal:588,protein:30,carbs:78,fats:10,
+   ingredients:['300g toor/moong dal with tadka','2 whole wheat rotis','Onion, tomato, cumin, asafoetida'],
+   foods:[{id:'idal300',qty:1},{id:'iroti1',qty:2}]},
+  {name:'Rajma Chawal',emoji:'🍛',cal:514,protein:22,carbs:100,fats:2,
+   ingredients:['200g rajma (kidney beans) curry','200g steamed rice','Onion & lemon salad'],
+   foods:[{id:'irajma200',qty:1},{id:'cric',qty:2}]},
+  {name:'Moong Dal Chilla',emoji:'🥞',cal:495,protein:27,carbs:81,fats:8,
+   ingredients:['3 moong dal chillas (green chutney)','50g oats porridge','Spices: cumin, ginger, green chilli'],
+   foods:[{id:'idalchilla3',qty:1},{id:'coat',qty:0.5}]},
+];
+
 const WORKOUTS = {
   Mon:{label:'Chest + Triceps',tag:'PUSH',color:'var(--orange)',exercises:[
     {name:'Flat Barbell Bench Press',sets:'4×8-10',note:'Primary mass builder — increase weight weekly'},
@@ -886,7 +1022,9 @@ let S = {
   activeWODay:'Mon',
   apiKey:'',
   chatHistory:[],
-  activeDayType:'gym'
+  activeDayType:'gym',
+  activeDietMode:'original',
+  activeIndianDiet:'nonveg'
 };
 
 function loadState(){
@@ -1047,10 +1185,21 @@ function updateRings(t){
 // =====================================================================
 let vegBuilt=false,recBuilt=false;
 
+function getCurrentPlan(){
+  if(S.activeDietMode==='indian'){
+    return INDIAN_MEAL_PLANS[S.activeIndianDiet][S.activeDayType];
+  }
+  return MEAL_PLANS[S.activeDayType];
+}
+
+function getCurrentRecipes(){
+  return S.activeDietMode==='indian'?INDIAN_RECIPES:RECIPES;
+}
+
 function renderDiet(){
   renderMealPlan();
   if(!vegBuilt){buildVegGrid();vegBuilt=true;}
-  if(!recBuilt){buildRecipesGrid();recBuilt=true;}
+  buildRecipesGrid();
 }
 
 function dietTab(tab,btn){
@@ -1058,6 +1207,25 @@ function dietTab(tab,btn){
   document.querySelectorAll('#page-diet .tab-panel').forEach(p=>p.classList.remove('active'));
   btn.classList.add('active');
   document.getElementById('dt-'+tab).classList.add('active');
+}
+
+function setDietMode(mode){
+  S.activeDietMode=mode;
+  saveState();
+  document.getElementById('dmb-original').classList.toggle('active',mode==='original');
+  document.getElementById('dmb-indian').classList.toggle('active',mode==='indian');
+  const indianToggle=document.getElementById('indianDietToggle');
+  indianToggle.style.display=mode==='indian'?'flex':'none';
+  renderMealPlan();
+  buildRecipesGrid();
+}
+
+function setIndianDiet(type){
+  S.activeIndianDiet=type;
+  saveState();
+  document.getElementById('dtb-nonveg').classList.toggle('active',type==='nonveg');
+  document.getElementById('dtb-iveg').classList.toggle('active',type==='veg');
+  renderMealPlan();
 }
 
 function setDayType(type){
@@ -1069,8 +1237,14 @@ function setDayType(type){
 }
 
 function renderMealPlan(){
-  const plan=MEAL_PLANS[S.activeDayType];
+  const plan=getCurrentPlan();
+  const isIndian=S.activeDietMode==='indian';
+  const dayLabel=S.activeDayType==='gym'?'Gym Day':'Work Day';
+  const modeLabel=isIndian?(S.activeIndianDiet==='nonveg'?'🇮🇳 Indian Non-Veg':'🇮🇳 Indian Veg'):'Original';
   document.getElementById('mealPlanContent').innerHTML=`
+    ${isIndian?`<div style="background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.2);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--text2)">
+      💰 <strong style="color:var(--orange)">Budget Indian Diet</strong> — Foods: chicken, mutton, eggs${S.activeIndianDiet==='veg'?', dal, rajma, chana':''} · All items available at local market
+    </div>`:''}
     <div class="meal-plan-card">
       ${plan.meals.map((m,mi)=>`
         <div class="meal-row">
@@ -1085,13 +1259,13 @@ function renderMealPlan(){
         </div>`).join('')}
     </div>
     <div class="plan-total-row">
-      <div class="plan-total-label">Daily Total (${S.activeDayType==='gym'?'Gym Day':'Work Day'})</div>
+      <div class="plan-total-label">${modeLabel} · ${dayLabel}</div>
       <div class="plan-total-val">~${plan.total} kcal</div>
     </div>`;
 }
 
 function addMealToLog(mi){
-  const meal=MEAL_PLANS[S.activeDayType].meals[mi];
+  const meal=getCurrentPlan().meals[mi];
   const today=todayKey();
   if(!S.foodLog[today])S.foodLog[today]=[];
   meal.foods.forEach(fi=>{
@@ -1143,7 +1317,8 @@ function buildVegGrid(){
 }
 
 function buildRecipesGrid(){
-  document.getElementById('recipesGrid').innerHTML=RECIPES.map((r,ri)=>{
+  const recipeList=getCurrentRecipes();
+  document.getElementById('recipesGrid').innerHTML=recipeList.map((r,ri)=>{
     const total=r.protein+r.carbs+r.fats||1;
     const pp=Math.round(r.protein/total*100);
     const cp=Math.round(r.carbs/total*100);
@@ -1184,7 +1359,7 @@ function buildRecipesGrid(){
 }
 
 function logRecipe(ri){
-  const r=RECIPES[ri];
+  const r=getCurrentRecipes()[ri];
   const today=todayKey();
   if(!S.foodLog[today])S.foodLog[today]=[];
   r.foods.forEach(fi=>{
@@ -1233,7 +1408,7 @@ function buildQuickChips(){
   const chips=document.getElementById('quickChips');
   let list;
   if(activeFoodFilter==='all'){
-    list=FOODS.filter(f=>f.cat==='chicken'||f.cat==='eggs').slice(0,10);
+    list=FOODS.filter(f=>f.cat==='chicken'||f.cat==='eggs'||f.cat==='mutton').slice(0,10);
   } else {
     list=FOODS.filter(f=>f.cat===activeFoodFilter).slice(0,10);
   }
