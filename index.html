@@ -336,6 +336,40 @@ option{background:var(--bg3);color:var(--text);}
 @keyframes toastIn{from{opacity:0;transform:translateX(20px);}to{opacity:1;transform:translateX(0);}}
 @keyframes toastOut{from{opacity:1;}to{opacity:0;transform:translateX(20px);}}
 
+/* WEEKLY PLAN */
+.week-day-pills{display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch;}
+.week-day-pill{flex-shrink:0;min-width:58px;padding:8px 6px;border-radius:10px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:11px;font-weight:700;cursor:pointer;transition:all 0.2s;text-align:center;font-family:'Barlow Condensed',sans-serif;}
+.week-day-pill .wpill-day{font-size:14px;font-weight:800;display:block;}
+.week-day-pill .wpill-type{font-size:9px;font-weight:600;display:block;margin-top:1px;}
+.week-day-pill.gym-day{border-color:rgba(255,107,53,0.3);}
+.week-day-pill.work-day{border-color:rgba(74,158,255,0.2);}
+.week-day-pill.active{background:var(--orange);border-color:var(--orange);color:#fff;}
+.week-day-pill.active .wpill-type{color:rgba(255,255,255,0.8);}
+
+.week-day-header{background:linear-gradient(135deg,var(--bg3),var(--bg4));border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.wdh-left .wdh-day{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;color:var(--text);}
+.wdh-left .wdh-workout{font-size:12px;color:var(--text2);margin-top:2px;}
+.wdh-macros{display:flex;gap:10px;flex-wrap:wrap;}
+.wdh-macro{text-align:center;}
+.wdh-macro-val{font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;}
+.wdh-macro-label{font-size:9px;color:var(--text3);font-weight:600;}
+
+.week-meal-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px;}
+.wmc-header{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border);}
+.wmc-time{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;color:var(--teal);background:var(--bg4);border:1px solid var(--border);border-radius:6px;padding:3px 8px;white-space:nowrap;flex-shrink:0;}
+.wmc-emoji{font-size:18px;flex-shrink:0;}
+.wmc-name{font-weight:700;font-size:14px;color:var(--text);flex:1;}
+.wmc-cal{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;color:var(--orange);flex-shrink:0;}
+.wmc-body{padding:10px 14px;}
+.wmc-desc{font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:8px;}
+.wmc-macros{display:flex;gap:12px;font-size:11px;font-weight:600;margin-bottom:8px;}
+.wmc-add{width:100%;padding:8px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text2);font-family:'Barlow',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.wmc-add:hover{background:var(--orange);border-color:var(--orange);color:#fff;}
+
+.week-total-bar{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;}
+.wtb-label{font-size:12px;color:var(--text2);font-weight:600;}
+.wtb-val{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:800;color:var(--orange);}
+
 /* BOTTOM NAV (mobile) */
 #bottom-nav{
   display:none;position:fixed;bottom:0;left:0;right:0;
@@ -542,6 +576,7 @@ option{background:var(--bg3);color:var(--text);}
 
   <div class="tab-bar">
     <button class="tab-btn active" onclick="dietTab('mealplan',this)">Meal Plan</button>
+    <button class="tab-btn" onclick="dietTab('weekly',this)">7-Day Plan</button>
     <button class="tab-btn" onclick="dietTab('nutrition',this)">Nutrition Guide</button>
     <button class="tab-btn" onclick="dietTab('recipes',this)">Quick Recipes</button>
   </div>
@@ -560,6 +595,15 @@ option{background:var(--bg3);color:var(--text);}
       <button class="day-toggle-btn" id="dtb-work" onclick="setDayType('work')">💼 Work Day</button>
     </div>
     <div id="mealPlanContent"></div>
+  </div>
+
+  <div class="tab-panel" id="dt-weekly">
+    <div class="day-toggle" style="margin-bottom:12px">
+      <button class="day-toggle-btn active" id="wdb-nonveg" onclick="setWeeklyDiet('nonveg')">🍗 Non-Veg</button>
+      <button class="day-toggle-btn" id="wdb-veg" onclick="setWeeklyDiet('veg')">🥦 Pure Veg</button>
+    </div>
+    <div class="week-day-pills" id="weekDayPills"></div>
+    <div id="weeklyContent"></div>
   </div>
 
   <div class="tab-panel" id="dt-nutrition">
@@ -995,6 +1039,349 @@ const INDIAN_RECIPES = [
    foods:[{id:'cb200',qty:1},{id:'cspo',qty:1.5},{id:'vbro',qty:1}]},
 ];
 
+const WEEKLY_PLAN = {
+  nonveg:[
+    {
+      day:'Monday',dayShort:'MON',type:'gym',workout:'Chest + Triceps',tag:'PUSH',color:'var(--orange)',
+      totalCal:2687,totalProtein:193,totalCarbs:332,totalFats:70,
+      meals:[
+        {time:'7:00 AM',emoji:'🍳',name:'Oats + Egg Bhurji',
+         desc:'80g oats porridge + 3-egg bhurji with onion, green chilli & turmeric · Eggs ONCE today — complex carbs + protein to start the week strong',
+         cal:551,protein:32,carbs:56,fats:24,foods:[{id:'coat',qty:0.8},{id:'iebhurji3',qty:1}]},
+        {time:'10:00 AM',emoji:'🍗',name:'Chicken Tikka + Roti + Salad',
+         desc:'150g chicken curry + 1 roti + cucumber-tomato salad · Mid-morning lean protein fuel',
+         cal:402,protein:42,carbs:30,fats:13,foods:[{id:'ichkcurry150',qty:1},{id:'iroti1',qty:1},{id:'vcuc',qty:1},{id:'vtom',qty:1}]},
+        {time:'1:00 PM',emoji:'🥗',name:'Chicken Curry + Rice + Broccoli',
+         desc:'200g chicken curry + 200g rice + 100g broccoli sabzi · Big lunch — power through afternoon',
+         cal:624,protein:58,carbs:69,fats:15,foods:[{id:'ichkcurry200',qty:1},{id:'cric',qty:2},{id:'vbro',qty:1}]},
+        {time:'4:00 PM',emoji:'⚡',name:'Pre-Workout: Banana + Sweet Potato',
+         desc:'1 banana + 100g sweet potato · Fast carbs 90 min before chest session — no heavy protein needed',
+         cal:191,protein:3,carbs:47,fats:1,foods:[{id:'cban',qty:1},{id:'cspo',qty:1}]},
+        {time:'7:30 PM',emoji:'💪',name:'Post-Workout: Mutton + Dal + Rice',
+         desc:'100g mutton curry + 100g dal tadka + 150g rice + mixed sabzi · Mutton on push day — maximum muscle repair overnight',
+         cal:566,protein:37,carbs:73,fats:14,foods:[{id:'imutton100',qty:1},{id:'idal300',qty:0.33},{id:'cric',qty:1.5},{id:'vmix',qty:0.67}]},
+        {time:'10:00 PM',emoji:'🌙',name:'Pre-Bed: Dal + Roti',
+         desc:'200g dal tadka + 1 roti · Slow-digesting legume protein — feeds muscles while you sleep',
+         cal:353,protein:21,carbs:58,fats:4,foods:[{id:'idal300',qty:0.67},{id:'iroti1',qty:1}]},
+      ]
+    },
+    {
+      day:'Tuesday',dayShort:'TUE',type:'gym',workout:'Back + Biceps',tag:'PULL',color:'var(--blue)',
+      totalCal:2723,totalProtein:199,totalCarbs:329,totalFats:73,
+      meals:[
+        {time:'7:00 AM',emoji:'🍳',name:'Oats + Veggie Omelette',
+         desc:'80g oats + 3-egg omelette with spinach — different egg prep from Monday, keeps it fresh',
+         cal:594,protein:36,carbs:61,fats:22,foods:[{id:'coat',qty:0.8},{id:'om3v',qty:1},{id:'vspi',qty:1}]},
+        {time:'10:00 AM',emoji:'🍗',name:'Grilled Chicken + Carrots + Banana',
+         desc:'150g grilled chicken breast + carrots + 1 banana · Clean lean protein + natural carbs mid-morning',
+         cal:394,protein:49,carbs:37,fats:6,foods:[{id:'cb100',qty:1.5},{id:'vcar',qty:1},{id:'cban',qty:1}]},
+        {time:'1:00 PM',emoji:'🐑',name:'Mutton Curry + Rice + Cauliflower',
+         desc:'150g mutton curry + 200g rice + 100g cauliflower sabzi · Mutton on pull day — great for back muscle recovery',
+         cal:615,protein:40,carbs:67,fats:20,foods:[{id:'imutton150',qty:1},{id:'cric',qty:2},{id:'vcau',qty:1}]},
+        {time:'4:00 PM',emoji:'⚡',name:'Pre-Workout: Banana + Sweet Potato',
+         desc:'1 banana + 100g sweet potato · Identical to Monday — simple effective pre-workout carbs',
+         cal:191,protein:3,carbs:47,fats:1,foods:[{id:'cban',qty:1},{id:'cspo',qty:1}]},
+        {time:'7:30 PM',emoji:'💪',name:'Post-Workout: Chicken + Asparagus + Beans + Rice',
+         desc:'200g chicken curry + 100g green beans + 100g asparagus + 150g rice · Micronutrient-rich post-pull day dinner',
+         cal:576,protein:58,carbs:59,fats:15,foods:[{id:'ichkcurry200',qty:1},{id:'vgb',qty:1},{id:'vasp',qty:1},{id:'cric',qty:1.5}]},
+        {time:'10:00 PM',emoji:'🌙',name:'Pre-Bed: Dal + Roti',
+         desc:'200g dal + 1 roti · Consistent overnight protein — same every night for habit',
+         cal:353,protein:21,carbs:58,fats:4,foods:[{id:'idal300',qty:0.67},{id:'iroti1',qty:1}]},
+      ]
+    },
+    {
+      day:'Wednesday',dayShort:'WED',type:'gym',workout:'Legs + Glutes',tag:'LEGS',color:'var(--green)',
+      totalCal:3110,totalProtein:241,totalCarbs:402,totalFats:74,
+      meals:[
+        {time:'7:00 AM',emoji:'🍳',name:'Oats + Scrambled Eggs + Spinach',
+         desc:'80g oats + 3 scrambled eggs + 100g spinach · LEG DAY = highest cal day — bigger breakfast',
+         cal:568,protein:35,carbs:58,fats:21,foods:[{id:'coat',qty:0.8},{id:'es3',qty:1},{id:'vspi',qty:1}]},
+        {time:'10:00 AM',emoji:'🍗',name:'Chicken Breast + Sweet Potato + Zucchini',
+         desc:'200g chicken breast + 100g sweet potato + 100g zucchini · Heavy protein mid-morning for leg day volume',
+         cal:433,protein:65,carbs:23,fats:8,foods:[{id:'cb200',qty:1},{id:'cspo',qty:1},{id:'vzuc',qty:1}]},
+        {time:'1:00 PM',emoji:'🐑',name:'Mutton + Dal + Rice + Broccoli (Big Bowl)',
+         desc:'150g mutton + 100g dal + 200g rice + 100g broccoli · BIGGEST meal — legs need the most fuel and recovery',
+         cal:740,protein:50,carbs:89,fats:20,foods:[{id:'imutton150',qty:1},{id:'idal300',qty:0.33},{id:'cric',qty:2},{id:'vbro',qty:1}]},
+        {time:'4:00 PM',emoji:'⚡',name:'Pre-Workout: 2 Bananas + Oats 40g',
+         desc:'2 bananas + 40g oats · CARB LOAD before legs — your heaviest session needs maximum glycogen',
+         cal:366,protein:8,carbs:75,fats:3,foods:[{id:'cban',qty:2},{id:'coat',qty:0.4}]},
+        {time:'7:30 PM',emoji:'💪',name:'Post-Workout: Chicken Curry + Rice 250g',
+         desc:'200g chicken curry + 250g rice + mixed sabzi · Extra rice post-legs to refill depleted glycogen stores',
+         cal:709,protein:60,carbs:86,fats:15,foods:[{id:'ichkcurry200',qty:1},{id:'cric',qty:2.5},{id:'vmix',qty:0.67}]},
+        {time:'10:00 PM',emoji:'🌙',name:'Pre-Bed: Dal + 2 Rotis',
+         desc:'200g dal + 2 rotis · Extra roti tonight — legs burned the most, need more overnight carbs for repair',
+         cal:473,protein:24,carbs:76,fats:7,foods:[{id:'idal300',qty:0.67},{id:'iroti1',qty:2}]},
+      ]
+    },
+    {
+      day:'Thursday',dayShort:'THU',type:'gym',workout:'Shoulders + Abs',tag:'DELTS',color:'var(--purple)',
+      totalCal:2679,totalProtein:190,totalCarbs:332,totalFats:74,
+      meals:[
+        {time:'7:00 AM',emoji:'🍳',name:'Oats + Egg Bhurji',
+         desc:'80g oats + 3-egg bhurji — same as Monday to keep week-end breakfast routine consistent',
+         cal:551,protein:32,carbs:56,fats:24,foods:[{id:'coat',qty:0.8},{id:'iebhurji3',qty:1}]},
+        {time:'10:00 AM',emoji:'🍗',name:'Chicken + Bell Pepper + Roti',
+         desc:'150g chicken curry + 1 roti + bell pepper & tomato — Vit C from bell pepper boosts iron absorption',
+         cal:423,protein:42,carbs:33,fats:14,foods:[{id:'ichkcurry150',qty:1},{id:'iroti1',qty:1},{id:'vbp',qty:1},{id:'vtom',qty:1}]},
+        {time:'1:00 PM',emoji:'🥗',name:'Chicken + Kale + Rice',
+         desc:'200g chicken curry + 100g kale sabzi + 150g rice · Kale is a superfood — iron, calcium, Vit K for shoulder health',
+         cal:574,protein:57,carbs:59,fats:15,foods:[{id:'ichkcurry200',qty:1},{id:'vkal',qty:1},{id:'cric',qty:1.5}]},
+        {time:'4:00 PM',emoji:'⚡',name:'Pre-Workout: Banana + Roti',
+         desc:'1 banana + 1 roti · Light pre-shoulder session carbs — shoulders need less fuel than legs',
+         cal:225,protein:4,carbs:45,fats:3,foods:[{id:'cban',qty:1},{id:'iroti1',qty:1}]},
+        {time:'7:30 PM',emoji:'💪',name:'Post-Workout: Mutton + Green Beans + Zucchini + Rice',
+         desc:'100g mutton + 100g green beans + 100g zucchini + 200g rice · Light mutton finish to the gym week',
+         cal:528,protein:30,carbs:70,fats:14,foods:[{id:'imutton100',qty:1},{id:'vgb',qty:1},{id:'vzuc',qty:1},{id:'cric',qty:2}]},
+        {time:'10:00 PM',emoji:'🌙',name:'Pre-Bed: Dal + Roti',
+         desc:'200g dal + 1 roti · Last gym day — consistent pre-bed protocol',
+         cal:353,protein:21,carbs:58,fats:4,foods:[{id:'idal300',qty:0.67},{id:'iroti1',qty:1}]},
+      ]
+    },
+    {
+      day:'Friday',dayShort:'FRI',type:'work',workout:'Rest + Work Shift',tag:'REST',color:'var(--blue)',
+      totalCal:2551,totalProtein:178,totalCarbs:296,totalFats:67,
+      meals:[
+        {time:'6:00 AM',emoji:'🍳',name:'Oats + Egg Bhurji',
+         desc:'80g oats + 3-egg bhurji — same quick breakfast before work shift, no time for complex prep',
+         cal:551,protein:32,carbs:56,fats:24,foods:[{id:'coat',qty:0.8},{id:'iebhurji3',qty:1}]},
+        {time:'9:00 AM',emoji:'🍗',name:'Chicken + Roti + Carrot (Shift Snack)',
+         desc:'150g chicken curry + 1 roti + carrots — meal prepped the night before, carry in a container',
+         cal:409,protein:41,carbs:32,fats:13,foods:[{id:'ichkcurry150',qty:1},{id:'iroti1',qty:1},{id:'vcar',qty:1}]},
+        {time:'12:00 PM',emoji:'🍽️',name:'Packed Lunch: Chicken + Rice + Broccoli',
+         desc:'200g chicken curry + 150g rice + 100g broccoli — biggest shift meal, eat sitting down if possible',
+         cal:559,protein:58,carbs:56,fats:15,foods:[{id:'ichkcurry200',qty:1},{id:'cric',qty:1.5},{id:'vbro',qty:1}]},
+        {time:'3:00 PM',emoji:'🍗',name:'Grilled Chicken + Banana',
+         desc:'100g grilled chicken + 1 banana — protein + carbs to power the final stretch of your shift',
+         cal:270,protein:32,carbs:27,fats:4,foods:[{id:'cb100',qty:1},{id:'cban',qty:1}]},
+        {time:'After Shift',emoji:'🐑',name:'Recovery Dinner: Mutton + Dal + Rice',
+         desc:'150g mutton + 100g dal + 150g rice + tomato salad · Post-shift recovery — you earned this',
+         cal:659,protein:47,carbs:72,fats:20,foods:[{id:'imutton150',qty:1},{id:'idal300',qty:0.33},{id:'cric',qty:1.5},{id:'vtom',qty:1}]},
+        {time:'Pre-Bed',emoji:'🌙',name:'Dal + Roti',
+         desc:'200g dal + 1 roti · Rest day pre-bed — consistent protocol even on work days',
+         cal:353,protein:21,carbs:58,fats:4,foods:[{id:'idal300',qty:0.67},{id:'iroti1',qty:1}]},
+      ]
+    },
+    {
+      day:'Saturday',dayShort:'SAT',type:'work',workout:'Rest + Work Shift',tag:'REST',color:'var(--blue)',
+      totalCal:2703,totalProtein:190,totalCarbs:319,totalFats:73,
+      meals:[
+        {time:'6:00 AM',emoji:'🍳',name:'Oats + Veggie Omelette',
+         desc:'80g oats + 3-egg omelette with spinach & bell pepper — variety on Saturday, different from Friday',
+         cal:594,protein:36,carbs:61,fats:22,foods:[{id:'coat',qty:0.8},{id:'om3v',qty:1},{id:'vspi',qty:1}]},
+        {time:'9:00 AM',emoji:'🍗',name:'Chicken Thigh + Roti + Salad',
+         desc:'150g chicken thigh + 1 roti + cucumber-tomato — thigh is fattier, more flavour, different from breast',
+         cal:475,protein:43,carbs:28,fats:20,foods:[{id:'ct100',qty:1.5},{id:'iroti1',qty:1},{id:'vcuc',qty:1},{id:'vtom',qty:1}]},
+        {time:'12:00 PM',emoji:'🍽️',name:'Chicken Curry + Rice + Cauliflower',
+         desc:'200g chicken curry + 200g rice + 100g cauliflower · Mid-shift fuel, packed from home',
+         cal:615,protein:57,carbs:67,fats:15,foods:[{id:'ichkcurry200',qty:1},{id:'cric',qty:2},{id:'vcau',qty:1}]},
+        {time:'3:00 PM',emoji:'🌱',name:'Sprouts + Banana',
+         desc:'100g moong sprouts + 1 banana — light afternoon snack, no cooking needed, carry in bag',
+         cal:210,protein:8,carbs:46,fats:0,foods:[{id:'isprout100',qty:1},{id:'cban',qty:1}]},
+        {time:'After Shift',emoji:'🐑',name:'Mutton + Roti + Asparagus',
+         desc:'100g mutton + 100g dal + 2 rotis + 100g asparagus · Saturday dinner — take time to eat properly after shift',
+         cal:596,protein:39,carbs:64,fats:20,foods:[{id:'imutton100',qty:1},{id:'idal300',qty:0.33},{id:'iroti1',qty:2},{id:'vasp',qty:1}]},
+        {time:'Pre-Bed',emoji:'🌙',name:'Dal + Roti',
+         desc:'100g dal + 1 roti — lighter pre-bed since tomorrow is rest day',
+         cal:236,protein:12,carbs:38,fats:3,foods:[{id:'idal300',qty:0.33},{id:'iroti1',qty:1}]},
+      ]
+    },
+    {
+      day:'Sunday',dayShort:'SUN',type:'work',workout:'Full Rest + Refeed',tag:'REFEED',color:'var(--teal)',
+      totalCal:2858,totalProtein:195,totalCarbs:348,totalFats:73,
+      meals:[
+        {time:'8:00 AM',emoji:'🍳',name:'Big Breakfast: Oats + Egg Bhurji + Banana',
+         desc:'80g oats + 3-egg bhurji + 1 banana · SUNDAY = sleep in + big breakfast to refuel the whole week',
+         cal:656,protein:33,carbs:83,fats:24,foods:[{id:'coat',qty:0.8},{id:'iebhurji3',qty:1},{id:'cban',qty:1}]},
+        {time:'11:00 AM',emoji:'🍗',name:'Chicken + Roti (Late Brunch Snack)',
+         desc:'200g chicken curry + 2 rotis + broccoli — late brunch, no rush today',
+         cal:604,protein:59,carbs:49,fats:20,foods:[{id:'ichkcurry200',qty:1},{id:'iroti1',qty:2},{id:'vbro',qty:1}]},
+        {time:'2:00 PM',emoji:'🐑',name:'Mutton + Dal + Rice (Sunday Lunch)',
+         desc:'150g mutton + 100g dal + 200g rice + mixed sabzi · Sunday special — cook a proper meal, take your time',
+         cal:700,protein:50,carbs:92,fats:20,foods:[{id:'imutton150',qty:1},{id:'idal300',qty:0.33},{id:'cric',qty:2},{id:'vmix',qty:0.5}]},
+        {time:'5:00 PM',emoji:'🍌',name:'Afternoon Refeed: 2 Bananas + Sweet Potato',
+         desc:'2 bananas + 100g sweet potato · Sunday refeed carbs — replenish glycogen for Monday training',
+         cal:296,protein:4,carbs:74,fats:1,foods:[{id:'cban',qty:2},{id:'cspo',qty:1}]},
+        {time:'8:00 PM',emoji:'🥗',name:'Light Dinner: Chicken + Asparagus + Rice',
+         desc:'200g chicken curry + 100g asparagus + 150g rice · Light Sunday dinner — not too heavy before Monday gym',
+         cal:610,protein:58,carbs:66,fats:15,foods:[{id:'ichkcurry200',qty:1},{id:'vasp',qty:1},{id:'cric',qty:1.5}]},
+        {time:'Pre-Bed',emoji:'🌙',name:'Pre-Bed: Dal + Roti',
+         desc:'200g dal + 1 roti · Set up Monday right — end Sunday with consistent pre-bed protein',
+         cal:353,protein:21,carbs:58,fats:4,foods:[{id:'idal300',qty:0.67},{id:'iroti1',qty:1}]},
+      ]
+    },
+  ],
+  veg:[
+    {
+      day:'Monday',dayShort:'MON',type:'gym',workout:'Chest + Triceps',tag:'PUSH',color:'var(--orange)',
+      totalCal:2639,totalProtein:137,totalCarbs:433,totalFats:41,
+      meals:[
+        {time:'7:00 AM',emoji:'🥞',name:'Oats + Moong Dal Chilla',
+         desc:'80g oats + 3 moong dal chillas with green chutney · High-protein veg breakfast — two plant proteins together',
+         cal:611,protein:32,carbs:101,fats:10,foods:[{id:'coat',qty:0.8},{id:'idalchilla3',qty:1}]},
+        {time:'10:00 AM',emoji:'🥗',name:'Chana + Sprouts Chaat',
+         desc:'100g chana + 100g sprouts + cucumber + lemon · Chana + sprouts = complete amino acid combo',
+         cal:285,protein:17,carbs:50,fats:3,foods:[{id:'ichana100',qty:1},{id:'isprout100',qty:1},{id:'vcuc',qty:1}]},
+        {time:'1:00 PM',emoji:'🍛',name:'Rajma + Dal + Rice + Sabzi',
+         desc:'200g rajma + 100g dal + 200g rice + mixed sabzi · Rice + two legumes = full protein profile for veg lean bulk',
+         cal:670,protein:35,carbs:128,fats:2,foods:[{id:'irajma200',qty:1},{id:'idal300',qty:0.33},{id:'cric',qty:2},{id:'vmix',qty:0.67}]},
+        {time:'4:00 PM',emoji:'⚡',name:'Pre-Workout: Banana + Sweet Potato',
+         desc:'1 banana + 100g sweet potato · Fast natural carbs — clean fuel for chest session',
+         cal:191,protein:3,carbs:47,fats:1,foods:[{id:'cban',qty:1},{id:'cspo',qty:1}]},
+        {time:'8:00 PM',emoji:'💪',name:'Post-Workout: Dal + Roti + Broccoli',
+         desc:'300g dal tadka + 3 rotis + 100g broccoli · Highest protein meal for veg plan — post-push day recovery',
+         cal:742,protein:39,carbs:121,fats:10,foods:[{id:'idal300',qty:1},{id:'iroti1',qty:3},{id:'vbro',qty:1}]},
+        {time:'10:00 PM',emoji:'🌙',name:'Pre-Bed: Sprouts + Roti',
+         desc:'100g moong sprouts + 1 roti · Light overnight protein — sprouts digest slowly',
+         cal:225,protein:10,carbs:37,fats:3,foods:[{id:'isprout100',qty:1},{id:'iroti1',qty:1}]},
+      ]
+    },
+    {
+      day:'Tuesday',dayShort:'TUE',type:'gym',workout:'Back + Biceps',tag:'PULL',color:'var(--blue)',
+      totalCal:2611,totalProtein:131,totalCarbs:423,totalFats:35,
+      meals:[
+        {time:'7:00 AM',emoji:'🥞',name:'Oats + Dal Chilla + Banana',
+         desc:'80g oats + 2 moong dal chillas + 1 banana · Extra banana on pull day — back workouts need high carbs',
+         cal:611,protein:27,carbs:101,fats:8,foods:[{id:'coat',qty:0.8},{id:'idalchilla3',qty:0.67},{id:'cban',qty:1}]},
+        {time:'10:00 AM',emoji:'🥗',name:'Rajma + Carrots + Tomato',
+         desc:'150g rajma + carrots + tomato chaat · Mid-morning legume protein, different from chana',
+         cal:254,protein:13,carbs:47,fats:1,foods:[{id:'irajma200',qty:0.75},{id:'vcar',qty:1},{id:'vtom',qty:1}]},
+        {time:'1:00 PM',emoji:'🍛',name:'Dal + Rice + Kale Sabzi',
+         desc:'300g dal + 200g rice + 100g kale — kale is mineral-rich, great for back/bicep recovery',
+         cal:666,protein:35,carbs:120,fats:4,foods:[{id:'idal300',qty:1},{id:'cric',qty:2},{id:'vkal',qty:1}]},
+        {time:'4:00 PM',emoji:'⚡',name:'Pre-Workout: Banana + Sweet Potato',
+         desc:'1 banana + 100g sweet potato · Same reliable pre-workout carbs',
+         cal:191,protein:3,carbs:47,fats:1,foods:[{id:'cban',qty:1},{id:'cspo',qty:1}]},
+        {time:'8:00 PM',emoji:'💪',name:'Post-Workout: Chana Dal Roti',
+         desc:'100g chana + 200g dal + 2 rotis + broccoli · Multiple legumes post-pull = maximum plant protein',
+         cal:664,protein:43,carbs:105,fats:8,foods:[{id:'ichana100',qty:1},{id:'idal300',qty:0.67},{id:'iroti1',qty:2},{id:'vbro',qty:1}]},
+        {time:'10:00 PM',emoji:'🌙',name:'Pre-Bed: Sprouts + Roti',
+         desc:'100g sprouts + 1 roti · Consistent overnight protein',
+         cal:225,protein:10,carbs:37,fats:3,foods:[{id:'isprout100',qty:1},{id:'iroti1',qty:1}]},
+      ]
+    },
+    {
+      day:'Wednesday',dayShort:'WED',type:'gym',workout:'Legs + Glutes',tag:'LEGS',color:'var(--green)',
+      totalCal:2935,totalProtein:149,totalCarbs:488,totalFats:43,
+      meals:[
+        {time:'7:00 AM',emoji:'🥞',name:'Oats + Moong Dal Chilla (Big)',
+         desc:'80g oats + 3 moong dal chillas · LEG DAY — bigger breakfast, more carbs',
+         cal:611,protein:32,carbs:101,fats:10,foods:[{id:'coat',qty:0.8},{id:'idalchilla3',qty:1}]},
+        {time:'10:00 AM',emoji:'🫘',name:'Chana + Sprouts + Sweet Potato',
+         desc:'100g chana + 100g sprouts + 100g sweet potato · Legumes + complex carbs — building up to big leg day',
+         cal:355,protein:17,carbs:65,fats:3,foods:[{id:'ichana100',qty:1},{id:'isprout100',qty:1},{id:'cspo',qty:1}]},
+        {time:'1:00 PM',emoji:'🍛',name:'Rajma + Dal + Rice (Leg Day Power)',
+         desc:'200g rajma + 200g dal + 250g rice + mixed sabzi · Biggest veg meal of the week — legs need maximum fuel',
+         cal:843,protein:48,carbs:162,fats:4,foods:[{id:'irajma200',qty:1},{id:'idal300',qty:0.67},{id:'cric',qty:2.5},{id:'vmix',qty:0.67}]},
+        {time:'4:00 PM',emoji:'⚡',name:'Pre-Workout: 2 Bananas + Oats',
+         desc:'2 bananas + 40g oats · LEG DAY CARB LOAD — maximum glycogen before squats and deadlifts',
+         cal:366,protein:8,carbs:75,fats:3,foods:[{id:'cban',qty:2},{id:'coat',qty:0.4}]},
+        {time:'8:00 PM',emoji:'💪',name:'Post-Workout: Dal + 3 Rotis + Sabzi',
+         desc:'300g dal + 3 rotis + 100g broccoli · Huge post-leg dinner — you burned the most today',
+         cal:742,protein:39,carbs:121,fats:10,foods:[{id:'idal300',qty:1},{id:'iroti1',qty:3},{id:'vbro',qty:1}]},
+        {time:'10:00 PM',emoji:'🌙',name:'Pre-Bed: Chana + Roti',
+         desc:'100g chana + 1 roti · Extra protein tonight — legs need overnight repair',
+         cal:284,protein:12,carbs:45,fats:6,foods:[{id:'ichana100',qty:1},{id:'iroti1',qty:1}]},
+      ]
+    },
+    {
+      day:'Thursday',dayShort:'THU',type:'gym',workout:'Shoulders + Abs',tag:'DELTS',color:'var(--purple)',
+      totalCal:2580,totalProtein:130,totalCarbs:424,totalFats:36,
+      meals:[
+        {time:'7:00 AM',emoji:'🥞',name:'Oats + Moong Dal Chilla',
+         desc:'80g oats + 3 moong dal chillas · Thursday = last gym day, stay consistent',
+         cal:611,protein:32,carbs:101,fats:10,foods:[{id:'coat',qty:0.8},{id:'idalchilla3',qty:1}]},
+        {time:'10:00 AM',emoji:'🥗',name:'Chana + Bell Pepper + Tomato',
+         desc:'100g chana + bell pepper + tomato salad · Bell pepper has 169% Vit C — great for shoulder joint health',
+         cal:219,protein:11,carbs:38,fats:4,foods:[{id:'ichana100',qty:1},{id:'vbp',qty:1},{id:'vtom',qty:1}]},
+        {time:'1:00 PM',emoji:'🍛',name:'Dal + Rice + Cauliflower',
+         desc:'300g dal + 200g rice + 100g cauliflower sabzi · Cauliflower is anti-inflammatory — good for shoulder recovery',
+         cal:665,protein:35,carbs:117,fats:4,foods:[{id:'idal300',qty:1},{id:'cric',qty:2},{id:'vcau',qty:1}]},
+        {time:'4:00 PM',emoji:'⚡',name:'Pre-Workout: Banana + Roti',
+         desc:'1 banana + 1 roti · Light pre-shoulder workout — shoulders need less fuel than legs or back',
+         cal:225,protein:4,carbs:45,fats:3,foods:[{id:'cban',qty:1},{id:'iroti1',qty:1}]},
+        {time:'8:00 PM',emoji:'💪',name:'Post-Workout: Rajma + Roti + Asparagus',
+         desc:'200g rajma + 2 rotis + 100g asparagus · Rajma is folate-rich — perfect for Thursday post-workout',
+         cal:635,protein:28,carbs:98,fats:7,foods:[{id:'irajma200',qty:1},{id:'iroti1',qty:2},{id:'vasp',qty:1}]},
+        {time:'10:00 PM',emoji:'🌙',name:'Pre-Bed: Sprouts + Roti',
+         desc:'100g sprouts + 1 roti · End the gym week consistently',
+         cal:225,protein:10,carbs:37,fats:3,foods:[{id:'isprout100',qty:1},{id:'iroti1',qty:1}]},
+      ]
+    },
+    {
+      day:'Friday',dayShort:'FRI',type:'work',workout:'Rest + Work Shift',tag:'REST',color:'var(--blue)',
+      totalCal:2365,totalProtein:119,totalCarbs:390,totalFats:33,
+      meals:[
+        {time:'6:00 AM',emoji:'🥞',name:'Oats + Dal Chilla',
+         desc:'80g oats + 3 moong dal chillas · Work day = same quick high-carb breakfast',
+         cal:611,protein:32,carbs:101,fats:10,foods:[{id:'coat',qty:0.8},{id:'idalchilla3',qty:1}]},
+        {time:'9:00 AM',emoji:'🫘',name:'Chana + Banana (Shift Snack)',
+         desc:'100g chana + 1 banana — portable, no refrigeration, perfect shift snack',
+         cal:269,protein:10,carbs:54,fats:3,foods:[{id:'ichana100',qty:1},{id:'cban',qty:1}]},
+        {time:'12:00 PM',emoji:'🍛',name:'Packed Rajma + Dal + Rice',
+         desc:'200g rajma + 100g dal + 200g rice — the most filling packed meal, fuel for second half of shift',
+         cal:630,protein:31,carbs:120,fats:2,foods:[{id:'irajma200',qty:1},{id:'idal300',qty:0.33},{id:'cric',qty:2}]},
+        {time:'3:00 PM',emoji:'🌱',name:'Sprouts Chaat (Shift Snack)',
+         desc:'100g sprouts + tomato + lemon — zero cooking, carry in a bag, eat standing up if needed',
+         cal:123,protein:8,carbs:23,fats:0,foods:[{id:'isprout100',qty:1},{id:'vtom',qty:1}]},
+        {time:'After Shift',emoji:'🍛',name:'Dal + Roti + Rice (Recovery)',
+         desc:'300g dal + 2 rotis + 100g rice + broccoli · Post-shift recovery — body needs carbs and protein after 13 hrs',
+         cal:752,protein:39,carbs:131,fats:8,foods:[{id:'idal300',qty:1},{id:'iroti1',qty:2},{id:'cric',qty:1},{id:'vbro',qty:1}]},
+        {time:'Pre-Bed',emoji:'🌙',name:'Chana + Roti',
+         desc:'100g chana + 1 roti · Consistent plant protein before sleep',
+         cal:284,protein:12,carbs:45,fats:6,foods:[{id:'ichana100',qty:1},{id:'iroti1',qty:1}]},
+      ]
+    },
+    {
+      day:'Saturday',dayShort:'SAT',type:'work',workout:'Rest + Work Shift',tag:'REST',color:'var(--blue)',
+      totalCal:2451,totalProtein:124,totalCarbs:404,totalFats:35,
+      meals:[
+        {time:'6:00 AM',emoji:'🥞',name:'Oats + Dal Chilla',
+         desc:'80g oats + 3 moong dal chillas · Same Saturday start as Friday — keep routine consistent on work days',
+         cal:611,protein:32,carbs:101,fats:10,foods:[{id:'coat',qty:0.8},{id:'idalchilla3',qty:1}]},
+        {time:'9:00 AM',emoji:'🥗',name:'Rajma + Cucumber + Banana',
+         desc:'150g rajma + cucumber salad + 1 banana — different legume from Friday, variety is key',
+         cal:326,protein:14,carbs:69,fats:2,foods:[{id:'irajma200',qty:0.75},{id:'vcuc',qty:1},{id:'cban',qty:1}]},
+        {time:'12:00 PM',emoji:'🍛',name:'Dal + Rice + Cauliflower',
+         desc:'300g dal + 200g rice + 100g cauliflower — packed hot if possible, satisfying shift lunch',
+         cal:665,protein:35,carbs:117,fats:4,foods:[{id:'idal300',qty:1},{id:'cric',qty:2},{id:'vcau',qty:1}]},
+        {time:'3:00 PM',emoji:'🌱',name:'Sprouts + Sweet Potato',
+         desc:'100g sprouts + 100g sweet potato — cooked sweet potato is easy to pack',
+         cal:191,protein:9,carbs:39,fats:0,foods:[{id:'isprout100',qty:1},{id:'cspo',qty:1}]},
+        {time:'After Shift',emoji:'🍛',name:'Chana + Roti + Dal',
+         desc:'100g chana + 100g dal + 2 rotis + asparagus — Saturday dinner, take time to eat properly',
+         cal:544,protein:25,carbs:88,fats:10,foods:[{id:'ichana100',qty:1},{id:'idal300',qty:0.33},{id:'iroti1',qty:2},{id:'vasp',qty:1}]},
+        {time:'Pre-Bed',emoji:'🌙',name:'Sprouts + Roti',
+         desc:'100g sprouts + 1 roti · Rest day pre-bed protein',
+         cal:225,protein:10,carbs:37,fats:3,foods:[{id:'isprout100',qty:1},{id:'iroti1',qty:1}]},
+      ]
+    },
+    {
+      day:'Sunday',dayShort:'SUN',type:'work',workout:'Full Rest + Refeed',tag:'REFEED',color:'var(--teal)',
+      totalCal:2782,totalProtein:143,totalCarbs:463,totalFats:43,
+      meals:[
+        {time:'8:00 AM',emoji:'🥞',name:'Big Veg Breakfast: Oats + Dal Chilla + Banana',
+         desc:'80g oats + 3 chillas + 1 banana · SUNDAY — sleep in, eat big, set up the week ahead',
+         cal:716,protein:33,carbs:128,fats:10,foods:[{id:'coat',qty:0.8},{id:'idalchilla3',qty:1},{id:'cban',qty:1}]},
+        {time:'11:00 AM',emoji:'🥗',name:'Chana + Sprouts + Sweet Potato',
+         desc:'100g chana + 100g sprouts + 100g sweet potato — Sunday brunch snack',
+         cal:355,protein:17,carbs:65,fats:3,foods:[{id:'ichana100',qty:1},{id:'isprout100',qty:1},{id:'cspo',qty:1}]},
+        {time:'2:00 PM',emoji:'🍛',name:'Sunday Special: Rajma + Dal + Rice',
+         desc:'200g rajma + 200g dal + 250g rice + mixed sabzi · Cook properly — this is your Sunday feast, refuel for Monday',
+         cal:868,protein:52,carbs:168,fats:5,foods:[{id:'irajma200',qty:1},{id:'idal300',qty:0.67},{id:'cric',qty:2.5},{id:'vmix',qty:0.67}]},
+        {time:'5:00 PM',emoji:'🍌',name:'Refeed Snack: 2 Bananas + Roti',
+         desc:'2 bananas + 1 roti · Sunday afternoon refeed — max glycogen for Monday chest day',
+         cal:330,protein:5,carbs:72,fats:4,foods:[{id:'cban',qty:2},{id:'iroti1',qty:1}]},
+        {time:'8:00 PM',emoji:'💪',name:'Light Dinner: Dal + Roti + Sabzi',
+         desc:'200g dal + 2 rotis + 100g zucchini — light Sunday dinner, not too heavy before gym Monday',
+         cal:513,protein:26,carbs:76,fats:7,foods:[{id:'idal300',qty:0.67},{id:'iroti1',qty:2},{id:'vzuc',qty:1}]},
+        {time:'Pre-Bed',emoji:'🌙',name:'Pre-Bed: Sprouts + Roti',
+         desc:'100g sprouts + 1 roti · End the week with consistent overnight protein',
+         cal:225,protein:10,carbs:37,fats:3,foods:[{id:'isprout100',qty:1},{id:'iroti1',qty:1}]},
+      ]
+    },
+  ]
+};
+
 const WORKOUTS = {
   Mon:{label:'Chest + Triceps',tag:'PUSH',color:'var(--orange)',exercises:[
     {name:'Flat Barbell Bench Press',sets:'4×8-10',note:'Primary mass builder — increase weight weekly'},
@@ -1054,7 +1441,8 @@ let S = {
   chatHistory:[],
   activeDayType:'gym',
   activeDietMode:'original',
-  activeIndianDiet:'nonveg'
+  activeIndianDiet:'nonveg',
+  activeWeekDay:0
 };
 
 function loadState(){
@@ -1230,6 +1618,7 @@ function renderDiet(){
   renderMealPlan();
   if(!vegBuilt){buildVegGrid();vegBuilt=true;}
   buildRecipesGrid();
+  renderWeekly();
 }
 
 function dietTab(tab,btn){
@@ -1256,6 +1645,107 @@ function setIndianDiet(type){
   document.getElementById('dtb-nonveg').classList.toggle('active',type==='nonveg');
   document.getElementById('dtb-iveg').classList.toggle('active',type==='veg');
   renderMealPlan();
+}
+
+function setWeeklyDiet(type){
+  S.activeIndianDiet=type;
+  saveState();
+  document.getElementById('wdb-nonveg').classList.toggle('active',type==='nonveg');
+  document.getElementById('wdb-veg').classList.toggle('active',type==='veg');
+  renderWeekly();
+}
+
+function setActiveWeekDay(idx){
+  S.activeWeekDay=idx;
+  saveState();
+  document.querySelectorAll('.week-day-pill').forEach((p,i)=>p.classList.toggle('active',i===idx));
+  renderWeeklyDay();
+}
+
+function renderWeekly(){
+  const plan=WEEKLY_PLAN[S.activeIndianDiet];
+  const today=new Date().getDay(); // 0=Sun,1=Mon,...6=Sat
+  // Map JS day (0=Sun) to our array index (0=Mon)
+  const todayIdx=today===0?6:today-1;
+  if(S.activeWeekDay===undefined||S.activeWeekDay===null)S.activeWeekDay=Math.min(todayIdx,6);
+  // sync toggles
+  const nv=document.getElementById('wdb-nonveg');
+  const iv=document.getElementById('wdb-veg');
+  if(nv)nv.classList.toggle('active',S.activeIndianDiet==='nonveg');
+  if(iv)iv.classList.toggle('active',S.activeIndianDiet==='veg');
+  // build day pills
+  const pillsEl=document.getElementById('weekDayPills');
+  if(!pillsEl)return;
+  pillsEl.innerHTML=plan.map((d,i)=>`
+    <button class="week-day-pill ${d.type}-day${i===S.activeWeekDay?' active':''}" onclick="setActiveWeekDay(${i})">
+      <span class="wpill-day">${d.dayShort}</span>
+      <span class="wpill-type" style="color:${i===S.activeWeekDay?'rgba(255,255,255,0.8)':d.color}">${d.tag}</span>
+    </button>`).join('');
+  renderWeeklyDay();
+}
+
+function renderWeeklyDay(){
+  const plan=WEEKLY_PLAN[S.activeIndianDiet];
+  const d=plan[S.activeWeekDay];
+  if(!d)return;
+  const el=document.getElementById('weeklyContent');
+  if(!el)return;
+  el.innerHTML=`
+    <div class="week-day-header">
+      <div class="wdh-left">
+        <div class="wdh-day">${d.day} <span class="badge" style="background:${d.color}22;color:${d.color};font-size:10px;vertical-align:middle">${d.tag}</span></div>
+        <div class="wdh-workout">💪 ${d.workout}</div>
+      </div>
+      <div class="wdh-macros">
+        <div class="wdh-macro"><div class="wdh-macro-val" style="color:var(--orange)">${d.totalCal}</div><div class="wdh-macro-label">KCAL</div></div>
+        <div class="wdh-macro"><div class="wdh-macro-val" style="color:var(--blue)">${d.totalProtein}g</div><div class="wdh-macro-label">PROTEIN</div></div>
+        <div class="wdh-macro"><div class="wdh-macro-val" style="color:var(--gold)">${d.totalCarbs}g</div><div class="wdh-macro-label">CARBS</div></div>
+        <div class="wdh-macro"><div class="wdh-macro-val" style="color:var(--purple)">${d.totalFats}g</div><div class="wdh-macro-label">FATS</div></div>
+      </div>
+    </div>
+    ${d.meals.map((m,mi)=>`
+    <div class="week-meal-card">
+      <div class="wmc-header">
+        <div class="wmc-time">${m.time}</div>
+        <div class="wmc-emoji">${m.emoji}</div>
+        <div class="wmc-name">${m.name}</div>
+        <div class="wmc-cal">${m.cal}<span style="font-size:9px;font-weight:500;color:var(--text3)"> kcal</span></div>
+      </div>
+      <div class="wmc-body">
+        <div class="wmc-desc">${m.desc}</div>
+        <div class="wmc-macros">
+          <span style="color:var(--blue)">P: ${m.protein}g</span>
+          <span style="color:var(--gold)">C: ${m.carbs}g</span>
+          <span style="color:var(--purple)">F: ${m.fats}g</span>
+        </div>
+        <button class="wmc-add" onclick="addWeeklyMealToLog(${S.activeWeekDay},${mi})">+ Add to Today's Log</button>
+      </div>
+    </div>`).join('')}
+    <div class="week-total-bar">
+      <div class="wtb-label">Day Total · ${d.type==='gym'?'🏋️ Gym Day':'💼 Work Day'}</div>
+      <div class="wtb-val">${d.totalCal} kcal</div>
+    </div>`;
+}
+
+function addWeeklyMealToLog(dayIdx,mealIdx){
+  const meal=WEEKLY_PLAN[S.activeIndianDiet][dayIdx].meals[mealIdx];
+  const today=todayKey();
+  if(!S.foodLog[today])S.foodLog[today]=[];
+  meal.foods.forEach(fi=>{
+    const f=getFoodById(fi.id);
+    if(!f)return;
+    S.foodLog[today].push({
+      id:f.id+'_'+Date.now()+'_'+Math.random().toString(36).slice(2),
+      name:f.name+(fi.qty!==1?' x'+fi.qty:''),
+      cal:+(f.cal*fi.qty).toFixed(1),
+      protein:+(f.protein*fi.qty).toFixed(1),
+      carbs:+(f.carbs*fi.qty).toFixed(1),
+      fats:+(f.fats*fi.qty).toFixed(1)
+    });
+  });
+  saveState();
+  if(currentPage==='dashboard')renderDashboard();
+  toast(meal.emoji+' "'+meal.name+'" added to log!');
 }
 
 function setDayType(type){
